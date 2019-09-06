@@ -1,6 +1,6 @@
 # resource-framework
 
-*a GoLang framework to implement (concourse-ci)[1] resources*
+*a GoLang framework to implement [concourse-ci][1] resources*
 
 ## Usage
 
