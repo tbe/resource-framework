@@ -63,6 +63,11 @@ func main() {
 }
 ```
 
+## Testing
+
+The `test` package provides a helper for testing resources, written with the `resource-framwork`.
+Have a look at the tests for the `resource` package and on [godoc][3]
+
 ## Resource Building
 
 To build a docker container for your resource, you could to this with a Dockerfile like this:
@@ -88,4 +93,5 @@ COPY --from=builder /target/opt /opt
 ```
 
 [1]: https://concourse-ci.org/
-[2]: https://godoc.org/github.com/tbe/resource-framework
+[2]: https://godoc.org/github.com/tbe/resource-framework/resource
+[3]: https://godoc.org/github.com/tbe/resource-framework/test
