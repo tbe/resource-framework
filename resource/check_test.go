@@ -42,11 +42,11 @@ func TestHandler_Check(t *testing.T) {
 		"valid input": {
 			Input:  `{"source":{"some":"string","testing":true},"version":{"number": 42}}`,
 			Output: `{"number":42}`,
-			Validation: func(assertion *assert.Assertions, res interface{}) {
+			Validation: func(_ *testing.T, assertion *assert.Assertions, res interface{}) {
 				r := res.(*testCheckResource)
 				assertion.Equal("string", r.source.Some)
 				assertion.Equal(true, r.source.Testing)
-				assertion.Equal( 42, r.version.Number)
+				assertion.Equal(42, r.version.Number)
 			},
 		},
 		"invalid input": {

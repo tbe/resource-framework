@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 )
+
 // AutoTestIn is a wrapper around the testing Handler to allow automatic testing
 // of multiple test cases for In resources
 func AutoTestIn(t *testing.T, factory ResourceFactory, cases CaseList) {
@@ -22,7 +23,7 @@ func AutoTestIn(t *testing.T, factory ResourceFactory, cases CaseList) {
 				}
 			}
 			if success && c.Validation != nil {
-				c.Validation(h.assert, res)
+				c.Validation(t, h.assert, res)
 			}
 		})
 	}

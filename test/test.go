@@ -26,11 +26,11 @@ type ResourceFactory func() resource.Resource
 
 // Case defines the input and expected result of a single test
 type Case struct {
-	Input       string                                           // the input for the test
-	Output      string                                           // the Output for the test. Can be empty
-	ShouldFail  bool                                             // defines if the testcase should fail
-	ErrorString string                                           // an optional error message to with
-	Validation  func(assertions *assert.Assertions, res interface{}) // an optional validation function
+	Input       string                                                             // the input for the test
+	Output      string                                                             // the Output for the test. Can be empty
+	ShouldFail  bool                                                               // defines if the testcase should fail
+	ErrorString string                                                             // an optional error message to with
+	Validation  func(t *testing.T, assertions *assert.Assertions, res interface{}) // an optional validation function
 }
 
 // CaseList is a list of named test cases

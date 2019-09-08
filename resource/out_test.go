@@ -54,7 +54,7 @@ func TestHandler_Out(t *testing.T) {
 		"valid input": {
 			Input:  `{"source":{"some":"string","testing":true},"params":{"why": "because", "really": true, "count": 2}}`,
 			Output: `{"metadata":[{"status":"cool"},{"status":"really cool"}],"version":{"number":42}}`,
-			Validation: func(assertions *assert.Assertions, res interface{}) {
+			Validation: func(_ *testing.T, assertions *assert.Assertions, res interface{}) {
 				r := res.(*testOutResource)
 				assertions.Equal("string", r.source.Some)
 				assertions.Equal(true, r.source.Testing)

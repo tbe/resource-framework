@@ -48,7 +48,7 @@ func TestHandler_In(t *testing.T) {
 		"valid input": {
 			Input:  `{"source":{"some":"string","testing":true},"version":{"number": 42}}`,
 			Output: `{"metadata":[{"status":"cool"},{"status":"really cool"}],"version":{"number":42}}`,
-			Validation: func(assertion *assert.Assertions, res interface{}) {
+			Validation: func(_ *testing.T, assertion *assert.Assertions, res interface{}) {
 				r := res.(*testInResource)
 				assertion.Equal("string", r.source.Some)
 				assertion.Equal(true, r.source.Testing)

@@ -23,7 +23,7 @@ func AutoTestCheck(t *testing.T, factory ResourceFactory, cases CaseList) {
 				}
 			}
 			if success && c.Validation != nil {
-				c.Validation(h.assert, res)
+				c.Validation(t, h.assert, res)
 			}
 		})
 	}
