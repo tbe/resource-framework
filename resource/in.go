@@ -1,6 +1,7 @@
 package resource
 
 import (
+	"errors"
 	"os"
 
 	ji "github.com/tbe/resource-framework/internal/jsoninterface"
@@ -18,28 +19,31 @@ type inOutput struct {
 }
 
 // In calls the In function of the resource implementation and handles the communication with concourse
-func (h *Handler) In() {
+func (h *Handler) In() error {
 	if len(os.Args) < 2 {
-		log.Error("missing commandline argument")
-		return
+		err := errors.New("missing commandline argument")
+		log.Error("%v", err)
+		return err
 	}
 
 	// check for a valid in resource
 	if h.in == nil {
 		_ = h.output(struct{}{})
-		return
+		return nil
 	}
 
 	// get the storage for the source
 	source := h.in.Source()
 	if err := validateStructPtr(source); err != nil {
 		log.Error("invalid source storage: %v", err)
+		return err
 	}
 
 	// get the storage for the version
 	version := h.in.Version()
 	if err := validateStructPtr(version); err != nil {
 		log.Error("invalid version storage: %v", err)
+		return err
 	}
 
 	input := &inInput{
@@ -49,14 +53,14 @@ func (h *Handler) In() {
 
 	// read our input
 	if err := h.input(input); err != nil {
-		log.Error("failed to read input: %v", err)
+		return err
 	}
 
 	// call the resource check function
 	v, m, err := h.in.In(os.Args[1])
 	if err != nil {
-		log.Error("%v", err)
-		return
+		log.Error(err.Error())
+		return err
 	}
 
 	result := inOutput{
@@ -65,6 +69,7 @@ func (h *Handler) In() {
 	}
 
 	if err := h.output(result); err != nil {
-		log.Error("failed to write response to concourse: %v", err)
+		return err
 	}
+	return nil
 }

@@ -3,6 +3,8 @@ package jsoninterface
 import (
     "encoding/json"
     "reflect"
+
+    "gopkg.in/go-playground/validator.v9"
 )
 
 type Interface struct {
@@ -26,4 +28,14 @@ func (i *Interface) UnmarshalJSON(data []byte) error {
     }
     i.data = v
     return nil
+}
+
+
+func InterfaceValidator(sl validator.StructLevel) {
+    jinterface := sl.Current().Interface().(Interface)
+    if errs := sl.Validator().Struct(jinterface.data); errs != nil {
+        for _,err := range errs.(validator.ValidationErrors) {
+            sl.ReportError(err.Value(),err.Field(),err.StructField(),err.Tag(),err.Param())
+        }
+    }
 }

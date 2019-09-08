@@ -5,11 +5,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/tbe/resource-framework/resource"
 	"github.com/tbe/resource-framework/test"
 )
 
 type TestInSource struct {
-	Some    string `json:"some"`
+	Some    string `json:"some" validate:"required"`
 	Testing bool   `json:"testing"`
 }
 
@@ -41,16 +42,23 @@ func (i *testInResource) In(dir string) (version interface{}, metadata []interfa
 }
 
 func TestHandler_In(t *testing.T) {
-	res := &testInResource{}
-	handler := test.NewHandler(t, res)
-
-	handler.TestIn(
-		`{"source":{"some":"string","testing":true},"version":{"number": 42}}`,
-		`{"metadata":[{"status":"cool"},{"status":"really cool"}],"version":{"number":42}}`,
-	)
-
-	// verify the parser result
-	assert.Equal(t, "string", res.source.Some)
-	assert.Equal(t, true, res.source.Testing)
-	assert.Equal(t, 42, res.version.Number)
+	test.AutoTestIn(t, func() resource.Resource {
+		return &testInResource{}
+	}, test.CaseList{
+		"valid input": {
+			Input:  `{"source":{"some":"string","testing":true},"version":{"number": 42}}`,
+			Output: `{"metadata":[{"status":"cool"},{"status":"really cool"}],"version":{"number":42}}`,
+			Validation: func(assertion *assert.Assertions, res interface{}) {
+				r := res.(*testInResource)
+				assertion.Equal("string", r.source.Some)
+				assertion.Equal(true, r.source.Testing)
+				assertion.Equal(42, r.version.Number)
+			},
+		},
+		"invalid input": {
+			Input:       `{"source":{"testing":true},"version":{"number": 42}}`,
+			ShouldFail:  true,
+			ErrorString: "failed to validate input: Key: 'inInput.Source.Some' Error:Field validation for 'Some' failed on the 'required' tag",
+		},
+	})
 }

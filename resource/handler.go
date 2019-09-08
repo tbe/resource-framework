@@ -3,12 +3,23 @@ package resource
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path"
 
+	"gopkg.in/go-playground/validator.v9"
+
+	ji "github.com/tbe/resource-framework/internal/jsoninterface"
 	"github.com/tbe/resource-framework/log"
 )
+
+var validate *validator.Validate
+
+func init() {
+	validate = validator.New()
+	validate.RegisterStructValidation(ji.InterfaceValidator, ji.Interface{})
+}
 
 // The Handler takes care about all communication with concourse.
 type Handler struct {
@@ -49,23 +60,42 @@ func NewHandler(resource interface{}) (*Handler, error) {
 }
 
 // Run checks the name of the called binary and executes the corresponding handler
-func (h *Handler) Run() {
+func (h *Handler) Run() error {
 	switch path.Base(os.Args[0]) {
 	case "check":
-		h.Check()
+		return h.Check()
 	case "in":
-		h.In()
+		return h.In()
 	case "out":
-		h.Out()
+		return h.Out()
 	default:
-		log.Error("unknown action %v", os.Args[0])
+		err := fmt.Errorf("unknown action %v", os.Args[0])
+		log.Error(err.Error())
+		return err
 	}
 }
 
 func (h *Handler) output(data interface{}) error {
-	return json.NewEncoder(h.Stdout).Encode(data)
+	if err := json.NewEncoder(h.Stdout).Encode(data); err != nil {
+		err := fmt.Errorf("failed to write response to concourse: %v", err)
+		log.Error(err.Error())
+		return err
+	}
+	return nil
 }
 
 func (h *Handler) input(data interface{}) error {
-	return json.NewDecoder(h.Stdin).Decode(data)
+	if err := json.NewDecoder(h.Stdin).Decode(data); err != nil {
+		err := fmt.Errorf("failed to read input: %v", err)
+		log.Error(err.Error())
+		return err
+	}
+
+	// validate the struct
+	if err := validate.Struct(data); err != nil {
+		err := fmt.Errorf("failed to validate input: %v", err)
+		log.Error(err.Error())
+		return err
+	}
+	return nil
 }

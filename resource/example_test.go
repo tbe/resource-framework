@@ -12,7 +12,7 @@ type DummySource struct {
 }
 
 type DummyVersion struct {
-	Counter int `json:"counter"`
+	Counter int `json:"counter" validate:"gt=0"`
 }
 
 // DummyResource implements a dummy check resource
@@ -50,5 +50,5 @@ func ExampleMain() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	handler.Run()
+	_ = handler.Run()
 }
