@@ -11,14 +11,37 @@ import (
 
 	"github.com/tbe/resource-framework/log"
 	"github.com/tbe/resource-framework/resource"
+	"github.com/tbe/resource-framework/resource/template"
 )
 
 var Log *Logger
 
-// as soon as the testing library is loaded, we replace our logger
 func init() {
+	// as soon as the testing library is loaded, we replace our logger
 	Log = NewLogger()
 	log.Log = Log
+
+	// and our Get* helpers for environment variables inside the template package
+	template.GetExternalURL = func() string {
+		return "http://localhost"
+	}
+	template.GetTeamName = func() string {
+		return "main"
+	}
+	template.GetPipelineName = func() string {
+		return "testpipeline"
+	}
+	template.GetJobName = func() string {
+		return "testjob"
+	}
+
+	template.GetBuildName = func() string {
+		return "42"
+	}
+
+	template.GetBuildID = func() string {
+		return "42"
+	}
 }
 
 // ResourceFactory is a function that returns a new, initialized, resource
