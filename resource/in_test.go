@@ -14,6 +14,11 @@ type TestInSource struct {
 	Testing bool   `json:"testing"`
 }
 
+type TestInParams struct {
+	Another string `json:"another" validate:"required"`
+	Param   int    `json:"param"`
+}
+
 type TestInVersion struct {
 	Number int `json:"number"`
 }
@@ -25,6 +30,7 @@ type TestInMetadata struct {
 type testInResource struct {
 	source  *TestInSource
 	version *TestInVersion
+	params  *TestInParams
 }
 
 func (i *testInResource) Source() (source interface{}) {
@@ -37,7 +43,12 @@ func (i *testInResource) Version() (version interface{}) {
 	return i.version
 }
 
-func (i *testInResource) In(dir string) (version interface{}, metadata []interface{}, err error) {
+func (i *testInResource) Params() (version interface{}) {
+	i.params = &TestInParams{}
+	return i.params
+}
+
+func (i *testInResource) In(_ string) (version interface{}, metadata []interface{}, err error) {
 	return i.version, []interface{}{&TestInMetadata{Status: "cool"}, &TestInMetadata{Status: "really cool"}}, nil
 }
 
@@ -46,17 +57,19 @@ func TestHandler_In(t *testing.T) {
 		return &testInResource{}
 	}, test.CaseList{
 		"valid input": {
-			Input:  `{"source":{"some":"string","testing":true},"version":{"number": 42}}`,
+			Input:  `{"source":{"some":"string","testing":true},"version":{"number": 42},"params":{"another":"thing","param":23}}`,
 			Output: `{"metadata":[{"status":"cool"},{"status":"really cool"}],"version":{"number":42}}`,
 			Validation: func(_ *testing.T, assertion *assert.Assertions, res interface{}) {
 				r := res.(*testInResource)
 				assertion.Equal("string", r.source.Some)
 				assertion.Equal(true, r.source.Testing)
 				assertion.Equal(42, r.version.Number)
+				assertion.Equal("thing", r.params.Another)
+				assertion.Equal(23, r.params.Param)
 			},
 		},
 		"invalid input": {
-			Input:       `{"source":{"testing":true},"version":{"number": 42}}`,
+			Input:       `{"source":{"testing":true},"version":{"number": 42},"params":{"another":"thing","param":23}}`,
 			ShouldFail:  true,
 			ErrorString: "failed to validate input: Key: 'inInput.Source.Some' Error:Field validation for 'Some' failed on the 'required' tag",
 		},

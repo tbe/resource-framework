@@ -1,6 +1,5 @@
 package resource
 
-
 // A Resource is the base for all three action resources.
 type Resource interface {
 	// Source must return a pointer to a struct, where the "source" definition is stored
@@ -21,6 +20,8 @@ type InResource interface {
 	Resource
 	// Version must return a pointer to a struct, where the "version" definition is stored
 	Version() (version interface{})
+	// Params must return a pointer to a struct, where the "params" definition is stored
+	Params() (params interface{})
 	// Fetch the resource and return the version and metadata
 	In(dir string) (version interface{}, metadata []interface{}, err error)
 }
@@ -31,5 +32,5 @@ type OutResource interface {
 	// Params must return a pointer to a struct, where the "params" definition is stored
 	Params() (params interface{})
 	// Put the resource and return the new version and metadata
-	Out(dir string)  (version interface{}, metadata []interface{}, err error)
+	Out(dir string) (version interface{}, metadata []interface{}, err error)
 }

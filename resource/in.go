@@ -11,6 +11,7 @@ import (
 type inInput struct {
 	Source  *ji.Interface `json:"source"`
 	Version *ji.Interface `json:"version"`
+	Params  *ji.Interface `json:"params"`
 }
 
 type inOutput struct {
@@ -46,9 +47,17 @@ func (h *Handler) In() error {
 		return err
 	}
 
+	// get the storage for the params
+	params := h.in.Params()
+	if err := validateStructPtr(params); err != nil {
+		log.Error("invalid params storage: %v", err)
+		return err
+	}
+
 	input := &inInput{
 		Source:  ji.NewInterface(source),
 		Version: ji.NewInterface(version),
+		Params:  ji.NewInterface(params),
 	}
 
 	// read our input
