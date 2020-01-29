@@ -6,6 +6,12 @@ type Resource interface {
 	Source() (source interface{})
 }
 
+// A ModeAwareResource may have different input parameter formats for different modes
+type ModeAwareResource interface {
+	// SetMode is called by the resource handler, and informs about the current resource mode
+	SetMode(mode ResourceMode)
+}
+
 // A CheckResource implements all required functions for the "check" action
 type CheckResource interface {
 	Resource
@@ -34,3 +40,11 @@ type OutResource interface {
 	// Put the resource and return the new version and metadata
 	Out(dir string) (version interface{}, metadata []interface{}, err error)
 }
+
+type ResourceMode uint8
+
+const (
+	CHECK ResourceMode = iota + 1
+	IN
+	OUT
+)

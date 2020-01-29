@@ -26,6 +26,7 @@ type Handler struct {
 	check CheckResource
 	in    InResource
 	out   OutResource
+	ma    ModeAwareResource
 
 	// Stdout is exported to allow mocking of the communication with concourse
 	Stdout io.Writer
@@ -56,6 +57,10 @@ func NewHandler(resource interface{}) (*Handler, error) {
 		return nil, errors.New("not a valid resource")
 	}
 
+	if ma, ok := resource.(ModeAwareResource); ok {
+		h.ma = ma
+	}
+
 	return h, nil
 }
 
@@ -63,10 +68,13 @@ func NewHandler(resource interface{}) (*Handler, error) {
 func (h *Handler) Run() error {
 	switch path.Base(os.Args[0]) {
 	case "check":
+		h.setMode(CHECK)
 		return h.Check()
 	case "in":
+		h.setMode(IN)
 		return h.In()
 	case "out":
+		h.setMode(OUT)
 		return h.Out()
 	default:
 		err := fmt.Errorf("unknown action %v", os.Args[0])
@@ -98,4 +106,10 @@ func (h *Handler) input(data interface{}) error {
 		return err
 	}
 	return nil
+}
+
+func (h *Handler) setMode(mode ResourceMode) {
+	if h.ma != nil {
+		h.ma.SetMode(mode)
+	}
 }
