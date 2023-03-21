@@ -1,6 +1,6 @@
 # DEPRECTAION NOTICE
 
-This repostiry is deprected. Please move to https://github.com/tbe/go-concourse-resource
+This repostiry is deprecated. Please move to https://github.com/tbe/go-concourse-resource
 
 # resource-framework
 
