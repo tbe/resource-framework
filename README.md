@@ -1,3 +1,7 @@
+# DEPRECTAION NOTICE
+
+This repostiry is deprected. Please move to https://github.com/tbe/go-concourse-resource
+
 # resource-framework
 
 *a GoLang framework to implement [concourse-ci][1] resources*
